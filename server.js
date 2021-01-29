@@ -1,5 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
+const cors = require('cors');
+const helmet = require('helmet');
 require('dotenv').config();
 
 const app = express();
@@ -29,6 +31,8 @@ const validTypes = [
 
 app.use(morgan('dev'));
 app.use(validateBearerToken);
+app.use(cors());
+app.use(helmet());
 
  app.get('/types', handleGetTypes);
 app.get("/pokemon", handleGetPokemon);
