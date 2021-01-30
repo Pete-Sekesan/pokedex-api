@@ -5,7 +5,8 @@ const helmet = require('helmet');
 require('dotenv').config();
 
 const app = express();
-const PORT = 8080;
+//const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 const POKEDEX = require("./pokedex.json");
 const validTypes = [
   `Bug`,
@@ -28,8 +29,10 @@ const validTypes = [
     `Water`,
 ];
 
+//process.env.NODE_ENV = "production"
+const morganSetting = process.env.NODE_ENV === "production" ? "tiny" : "dev";
 
-app.use(morgan('dev'));
+app.use(morgan(morganSetting));
 app.use(validateBearerToken);
 app.use(cors());
 app.use(helmet());
@@ -71,6 +74,16 @@ function handleGetPokemon(req, res) {
 
     res.json(response);
 }
+
+app.use((error, req, res, next) => {
+    let response;
+    if (process.env.NODE_ENV === 'production') {
+        response = { error: { message: 'server error' } };
+    } else {
+        response = { error }
+    }
+    res.status(500).json(response);
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`)
